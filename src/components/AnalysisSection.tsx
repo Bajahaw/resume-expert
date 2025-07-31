@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createApiUrl, API_CONFIG } from "../config/api";
 
 interface AnalysisResult {
   score: number;
@@ -123,7 +124,7 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
     setError(null);
 
     try {
-      const response = await fetch("/api/analyze", {
+      const response = await fetch(createApiUrl(API_CONFIG.ENDPOINTS.ANALYZE), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

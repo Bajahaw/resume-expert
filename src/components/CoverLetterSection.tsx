@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createApiUrl, API_CONFIG } from "../config/api";
 
 interface CoverLetterSectionProps {
   resume: string;
@@ -100,16 +101,19 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
     setError(null);
 
     try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        createApiUrl(API_CONFIG.ENDPOINTS.GENERATE),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            resume: resume.trim(),
+            jobDescription: jobDescription.trim(),
+          }),
         },
-        body: JSON.stringify({
-          resume: resume.trim(),
-          jobDescription: jobDescription.trim(),
-        }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Generation failed: ${response.statusText}`);
@@ -157,7 +161,7 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
     if (!coverLetter) return;
 
     try {
-      const response = await fetch("/api/pdf", {
+      const response = await fetch(createApiUrl(API_CONFIG.ENDPOINTS.PDF), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
