@@ -2,9 +2,17 @@ import React, { useState } from "react";
 import { createApiUrl, API_CONFIG } from "../config/api";
 
 interface AnalysisResult {
-  score: number;
-  keywords: string[];
-  enhancements: string[];
+  breakdown: {
+    keywordMatch: number;
+    experienceRelevance: number;
+    skillAlignment: number;
+    overall: number;
+  };
+  keywordAnalysis: {
+    missing: string[];
+    present: string[];
+  };
+  suggestions: string[];
 }
 
 interface AnalysisSectionProps {
@@ -199,22 +207,58 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
         {analysis && (
           <div className="space-y-6">
             {/* Score Display */}
-            <ScoreDisplay score={analysis.score} />
+            <ScoreDisplay score={analysis.breakdown.overall} />
 
-            {/* Keywords Section */}
-            {analysis.keywords.length > 0 && (
-              <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+            {/* Detailed Score Breakdown */}
+            <div className="bg-gray-50 dark:bg-gray-900/30 rounded-xl p-6 border border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-2 mb-4">
+                <ChartBarIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Score Breakdown
+                </h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                    {analysis.breakdown.keywordMatch}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Keyword Match
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
+                    {analysis.breakdown.experienceRelevance}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Experience Relevance
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-white dark:bg-gray-800 rounded-lg">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">
+                    {analysis.breakdown.skillAlignment}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    Skill Alignment
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Missing Keywords Section */}
+            {analysis.keywordAnalysis.missing.length > 0 && (
+              <div className="bg-red-50 dark:bg-red-900/30 rounded-xl p-6 border border-red-200 dark:border-red-800">
                 <div className="flex items-center gap-2 mb-4">
-                  <TagIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                  <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
-                    Recommended Keywords
+                  <TagIcon className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">
+                    Missing Keywords
                   </h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {analysis.keywords.map((keyword, index) => (
+                  {analysis.keywordAnalysis.missing.map((keyword, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-200"
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-200"
                     >
                       {keyword}
                     </span>
@@ -223,17 +267,39 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
               </div>
             )}
 
-            {/* Enhancement Tips */}
-            {analysis.enhancements.length > 0 && (
+            {/* Present Keywords Section */}
+            {analysis.keywordAnalysis.present.length > 0 && (
+              <div className="bg-green-50 dark:bg-green-900/30 rounded-xl p-6 border border-green-200 dark:border-green-800">
+                <div className="flex items-center gap-2 mb-4">
+                  <TagIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <h3 className="text-lg font-semibold text-green-900 dark:text-green-100">
+                    Found Keywords
+                  </h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {analysis.keywordAnalysis.present.map((keyword, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200"
+                    >
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Suggestions Section */}
+            {analysis.suggestions.length > 0 && (
               <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
                 <div className="flex items-center gap-2 mb-4">
                   <LightBulbIcon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100">
-                    Enhancement Tips
+                    Improvement Suggestions
                   </h3>
                 </div>
                 <ul className="space-y-3">
-                  {analysis.enhancements.map((tip, index) => (
+                  {analysis.suggestions.map((suggestion, index) => (
                     <li
                       key={index}
                       className="flex items-start gap-3 text-purple-800 dark:text-purple-200"
@@ -241,7 +307,7 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
                       <span className="flex-shrink-0 w-6 h-6 bg-purple-200 dark:bg-purple-700 rounded-full flex items-center justify-center text-xs font-semibold text-purple-800 dark:text-purple-200 mt-0.5">
                         {index + 1}
                       </span>
-                      <span className="text-sm">{tip}</span>
+                      <span className="text-sm">{suggestion}</span>
                     </li>
                   ))}
                 </ul>
@@ -258,9 +324,10 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
               "Analyze Resume" to get:
             </p>
             <ul className="text-sm mt-2 space-y-1">
-              <li>• A compatibility score (0-100)</li>
-              <li>• Missing keywords to include</li>
-              <li>• Specific enhancement recommendations</li>
+              <li>• Overall compatibility score and detailed breakdown</li>
+              <li>• Missing keywords that should be included</li>
+              <li>• Keywords already found in your resume</li>
+              <li>• Specific improvement suggestions</li>
             </ul>
           </div>
         )}

@@ -478,6 +478,46 @@ export const cn = (
   return args.filter(Boolean).join(" ").trim();
 };
 
+// Simple markdown parser for basic formatting
+export const parseMarkdown = (text: string): string => {
+  if (!text) return "";
+
+  return (
+    text
+      // Headers
+      .replace(
+        /^### (.*$)/gim,
+        '<h3 class="text-lg font-semibold mb-2 mt-4">$1</h3>',
+      )
+      .replace(
+        /^## (.*$)/gim,
+        '<h2 class="text-xl font-semibold mb-3 mt-6">$1</h2>',
+      )
+      .replace(
+        /^# (.*$)/gim,
+        '<h1 class="text-2xl font-bold mb-4 mt-8">$1</h1>',
+      )
+
+      // Bold and italic
+      .replace(/\*\*\*(.*?)\*\*\*/g, "<strong><em>$1</em></strong>")
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+
+      // Line breaks and paragraphs
+      .replace(/\n\n/g, '</p><p class="mb-4">')
+      .replace(/\n/g, "<br>")
+
+      // Wrap in paragraph tags
+      .replace(/^(.+)/, '<p class="mb-4">$1')
+      .replace(/(.+)$/, "$1</p>")
+  );
+};
+
+// Convert markdown to React-safe HTML
+export const markdownToHtml = (markdown: string): { __html: string } => {
+  return { __html: parseMarkdown(markdown) };
+};
+
 // Generate unique ID
 export const generateId = (): string => {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);

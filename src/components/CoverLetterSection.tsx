@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { createApiUrl, API_CONFIG } from "../config/api";
+import { markdownToHtml } from "../utils";
 
 interface CoverLetterSectionProps {
   resume: string;
@@ -120,7 +121,7 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
       }
 
       const result = await response.json();
-      setCoverLetter(result.coverLetter || result.letter || "");
+      setCoverLetter(result.letter || "");
     } catch (err) {
       setError(
         err instanceof Error
@@ -240,9 +241,10 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
             {/* Cover Letter Content */}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                  {coverLetter}
-                </div>
+                <div
+                  className="text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={markdownToHtml(coverLetter)}
+                />
               </div>
             </div>
 

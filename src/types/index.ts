@@ -1,13 +1,20 @@
 // API Response Types
 export interface AnalysisResponse {
-  score: number;
-  keywords: string[];
-  enhancements: string[];
+  breakdown: {
+    keywordMatch: number;
+    experienceRelevance: number;
+    skillAlignment: number;
+    overall: number;
+  };
+  keywordAnalysis: {
+    missing: string[];
+    present: string[];
+  };
+  suggestions: string[];
 }
 
 export interface CoverLetterResponse {
-  coverLetter: string;
-  letter?: string; // Alternative field name for flexibility
+  letter: string;
 }
 
 export interface PDFResponse {
@@ -47,7 +54,7 @@ export interface PDFRequest {
 }
 
 // Theme Types
-export type Theme = 'light' | 'dark';
+export type Theme = "light" | "dark";
 
 export interface ThemeContextType {
   theme: Theme;
@@ -70,11 +77,11 @@ export interface FileData {
 }
 
 // Utility Types
-export type ButtonVariant = 'primary' | 'secondary' | 'danger';
-export type InputSize = 'sm' | 'md' | 'lg';
-export type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+export type ButtonVariant = "primary" | "secondary" | "danger";
+export type InputSize = "sm" | "md" | "lg";
+export type LoadingState = "idle" | "loading" | "success" | "error";
 
-// Analysis Result Types
+// Legacy Analysis Result Types (for backward compatibility)
 export interface KeywordAnalysis {
   missing: string[];
   present: string[];
@@ -84,11 +91,15 @@ export interface KeywordAnalysis {
 export interface ScoreBreakdown {
   keywordMatch: number;
   experienceRelevance: number;
-  skillsAlignment: number;
+  skillAlignment: number;
   overall: number;
 }
 
-export interface DetailedAnalysisResponse extends AnalysisResponse {
+// Legacy interface - use AnalysisResponse instead
+export interface DetailedAnalysisResponse {
+  score?: number;
+  keywords?: string[];
+  enhancements?: string[];
   breakdown?: ScoreBreakdown;
   keywordAnalysis?: KeywordAnalysis;
   suggestions?: {
@@ -102,7 +113,7 @@ export interface DetailedAnalysisResponse extends AnalysisResponse {
 export interface FormField {
   id: string;
   label: string;
-  type: 'text' | 'textarea' | 'file' | 'select';
+  type: "text" | "textarea" | "file" | "select";
   required?: boolean;
   placeholder?: string;
   validation?: {
