@@ -144,7 +144,8 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error(`Analysis failed: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(errorText || `Analysis failed: ${response.statusText}`);
       }
 
       const result = await response.json();

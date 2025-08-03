@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { createApiUrl, API_CONFIG } from "../config/api";
-import { markdownToHtml } from "../utils";
 
 interface CoverLetterSectionProps {
   resume: string;
@@ -117,11 +116,14 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error(`Generation failed: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(
+          errorText || `Generation failed: ${response.statusText}`,
+        );
       }
 
-      const result = await response.json();
-      setCoverLetter(result.letter || "");
+      const result = await response.text();
+      setCoverLetter(result || "");
     } catch (err) {
       setError(
         err instanceof Error
@@ -174,7 +176,10 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error(`PDF generation failed: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(
+          errorText || `PDF generation failed: ${response.statusText}`,
+        );
       }
 
       const blob = await response.blob();
@@ -241,10 +246,9 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
             {/* Cover Letter Content */}
             <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
               <div className="prose prose-gray dark:prose-invert max-w-none">
-                <div
-                  className="text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={markdownToHtml(coverLetter)}
-                />
+                <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {coverLetter}
+                </div>
               </div>
             </div>
 
