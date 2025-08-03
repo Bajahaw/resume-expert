@@ -59,7 +59,7 @@ export const extractTextFromPDF = async (file: File): Promise<string> => {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
           const pageText = textContent.items
-            .map((item: any) => item.str)
+            .map((item) => ("str" in item ? item.str : ""))
             .join(" ");
           fullText += pageText + "\n";
         }
@@ -94,7 +94,7 @@ export const extractTextFromPDFLocal = async (file: File): Promise<string> => {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
           const pageText = textContent.items
-            .map((item: any) => item.str)
+            .map((item) => ("str" in item ? item.str : ""))
             .join(" ");
           fullText += pageText + "\n";
         }
@@ -279,8 +279,8 @@ export const validateEmail = (email: string): boolean => {
 };
 
 export const validatePhone = (phone: string): boolean => {
-  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-  return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ""));
+  const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+  return phoneRegex.test(phone.replace(/[\s\-()]/g, ""));
 };
 
 export const sanitizeText = (text: string): string => {
@@ -292,7 +292,7 @@ export const sanitizeText = (text: string): string => {
 
 // Local storage utilities
 export const storage = {
-  set: (key: string, value: any): void => {
+  set: (key: string, value: unknown): void => {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
@@ -349,7 +349,7 @@ export const formatDateTime = (date: Date | string): string => {
 };
 
 // Debounce utility
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number,
 ): ((...args: Parameters<T>) => void) => {
@@ -361,7 +361,7 @@ export const debounce = <T extends (...args: any[]) => any>(
 };
 
 // Throttle utility
-export const throttle = <T extends (...args: any[]) => any>(
+export const throttle = <T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number,
 ): ((...args: Parameters<T>) => void) => {
@@ -382,10 +382,10 @@ export const deepClone = <T>(obj: T): T => {
   if (obj instanceof Array)
     return obj.map((item) => deepClone(item)) as unknown as T;
   if (typeof obj === "object") {
-    const clonedObj = {} as { [key: string]: any };
+    const clonedObj = {} as { [key: string]: unknown };
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        clonedObj[key] = deepClone(obj[key]);
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        clonedObj[key] = deepClone((obj as Record<string, unknown>)[key]);
       }
     }
     return clonedObj as T;

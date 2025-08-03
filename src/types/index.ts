@@ -46,6 +46,7 @@ export interface AnalysisRequest {
 export interface CoverLetterRequest {
   resume: string;
   jobDescription: string;
+  reference?: string;
 }
 
 export interface PDFRequest {
@@ -133,7 +134,7 @@ export interface FormState {
 // Storage Types
 export interface StorageItem {
   key: string;
-  value: any;
+  value: unknown;
   timestamp: number;
   expiry?: number;
 }

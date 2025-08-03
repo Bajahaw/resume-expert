@@ -4,6 +4,7 @@ import { createApiUrl, API_CONFIG } from "../config/api";
 interface CoverLetterSectionProps {
   resume: string;
   jobDescription: string;
+  reference?: string;
 }
 
 const DocumentTextIcon: React.FC<{ className?: string }> = ({
@@ -85,8 +86,10 @@ const CheckIcon: React.FC<{ className?: string }> = ({
 export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
   resume,
   jobDescription,
+  reference: initialReference,
 }) => {
   const [coverLetter, setCoverLetter] = useState<string>("");
+  const [reference, setReference] = useState<string>(initialReference || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
@@ -111,6 +114,7 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
           body: JSON.stringify({
             resume: resume.trim(),
             jobDescription: jobDescription.trim(),
+            reference: reference.trim() || undefined,
           }),
         },
       );
@@ -210,6 +214,32 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
       </div>
 
       <div className="space-y-6">
+        {/* Reference Input */}
+        <div className="space-y-2">
+          <label
+            htmlFor="reference"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Reference Text (Optional)
+          </label>
+          <textarea
+            id="reference"
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
+            placeholder="Enter any reference text that the AI should use as a basis for generating the cover letter (e.g., sample cover letters, specific writing style examples, or additional context)..."
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+                     bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                     placeholder-gray-500 dark:placeholder-gray-400
+                     focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                     dark:focus:ring-blue-400 dark:focus:border-blue-400
+                     resize-vertical min-h-[120px] max-h-[300px]"
+          />
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            This text will be used as additional context for the AI to generate
+            a more tailored cover letter.
+          </p>
+        </div>
+
         {/* Generate Button */}
         <div className="flex justify-center">
           <button
@@ -294,6 +324,7 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
               <li>• Highlights relevant experience from your resume</li>
               <li>• Addresses specific job requirements</li>
               <li>• Uses professional formatting and tone</li>
+              <li>• Incorporates reference text if provided</li>
               <li>• Can be copied or downloaded as PDF</li>
             </ul>
           </div>
