@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { createApiUrl, API_CONFIG } from "../config/api";
+import type { CoverLetterResponse } from "../types";
+import { generateCoverLetterPDF } from "../utils/pdfGenerator";
 
 interface CoverLetterSectionProps {
   resume: string;
@@ -126,8 +128,14 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
         );
       }
 
-      const result = await response.text();
-      setCoverLetter(result || "");
+      const result: CoverLetterResponse = await response.json();
+      const letterContent = result.letter || "";
+
+      if (!letterContent.trim()) {
+        throw new Error("Received empty cover letter from server");
+      }
+
+      setCoverLetter(letterContent);
     } catch (err) {
       setError(
         err instanceof Error
@@ -164,40 +172,19 @@ export const CoverLetterSection: React.FC<CoverLetterSectionProps> = ({
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = () => {
     if (!coverLetter) return;
 
     try {
-      const response = await fetch(createApiUrl(API_CONFIG.ENDPOINTS.PDF), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: coverLetter,
-          title: "Cover Letter",
-        }),
+      generateCoverLetterPDF(coverLetter, {
+        title: "Cover Letter",
+        fontSize: 12,
+        lineHeight: 6,
+        margin: 20,
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          errorText || `PDF generation failed: ${response.statusText}`,
-        );
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "cover-letter.pdf";
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
     } catch (err) {
       console.error("PDF download failed:", err);
-      setError(err instanceof Error ? err.message : "Failed to download PDF");
+      setError(err instanceof Error ? err.message : "Failed to generate PDF");
     }
   };
 
