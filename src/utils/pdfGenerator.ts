@@ -32,7 +32,7 @@ export const generateCoverLetterPDF = (
   const maxHeight = pageHeight - margin * 2;
 
   // Set font
-  pdf.setFont("Arial", "normal");
+  pdf.setFont("helvetica", "normal");
   pdf.setFontSize(fontSize);
 
   // Split content into lines that fit the page width
